@@ -57,43 +57,63 @@ public class ParamWrapper implements ParametricModelChecker {
 
 		return evaluate(modelString, reliabilityProperty, model);
 	}
+	
+	private File writeModelFile(String modelString) throws IOException {
+		File modelFile = File.createTempFile("model", "param");
+		FileWriter modelWriter = new FileWriter(modelFile);
+		modelWriter.write(modelString);
+		modelWriter.flush();
+		modelWriter.close();
+		
+		return modelFile;
+	}
+	
+	private File writePropertyFile(String property) throws IOException {
+		File propertyFile = File.createTempFile("property", "prop");
+		FileWriter propertyWriter = new FileWriter(propertyFile);
+		propertyWriter.write(property);
+		propertyWriter.flush();
+		propertyWriter.close();
+		
+		return propertyFile;
+	}
+	
+	private String writeFormula(File modelFile, File propertyFile, File resultsFile, 
+			String modelString, ParamModel model) throws IOException {
+		String formula;
+		long startTime = System.nanoTime();
+		if (usePrism && !modelString.contains("const")) {
+		    formula = invokeModelChecker(modelFile.getAbsolutePath(),
+		                                 propertyFile.getAbsolutePath(),
+		                                 resultsFile.getAbsolutePath());
+		} else if(usePrism) {
+		    formula = invokeParametricPRISM(model,
+		                                    modelFile.getAbsolutePath(),
+                                            propertyFile.getAbsolutePath(),
+                                            resultsFile.getAbsolutePath());
+		} else {
+		    formula = invokeParametricModelChecker(modelFile.getAbsolutePath(),
+		                                           propertyFile.getAbsolutePath(),
+		                                           resultsFile.getAbsolutePath());
+		}
+		long elapsedTime = System.nanoTime() - startTime;
+        modelCollector.collectModelCheckingTime(elapsedTime);
+		return formula.trim().replaceAll("\\s+", "");
+	}
 
 	private String evaluate(String modelString, String property, ParamModel model) {
 		try {
 		    LOGGER.finer(modelString);
-			File modelFile = File.createTempFile("model", "param");
-			FileWriter modelWriter = new FileWriter(modelFile);
-			modelWriter.write(modelString);
-			modelWriter.flush();
-			modelWriter.close();
-
-			File propertyFile = File.createTempFile("property", "prop");
-			FileWriter propertyWriter = new FileWriter(propertyFile);
-			propertyWriter.write(property);
-			propertyWriter.flush();
-			propertyWriter.close();
+		    
+		    File modelFile = writeModelFile(modelString);
+		    
+		    File propertyFile = writePropertyFile(property);
 
 			File resultsFile = File.createTempFile("result", null);
+			
+			String formula = writeFormula(modelFile, propertyFile, resultsFile, modelString, model);
 
-			String formula;
-			long startTime = System.nanoTime();
-			if (usePrism && !modelString.contains("const")) {
-			    formula = invokeModelChecker(modelFile.getAbsolutePath(),
-			                                 propertyFile.getAbsolutePath(),
-			                                 resultsFile.getAbsolutePath());
-			} else if(usePrism) {
-			    formula = invokeParametricPRISM(model,
-			                                    modelFile.getAbsolutePath(),
-                                                propertyFile.getAbsolutePath(),
-                                                resultsFile.getAbsolutePath());
-			} else {
-			    formula = invokeParametricModelChecker(modelFile.getAbsolutePath(),
-			                                           propertyFile.getAbsolutePath(),
-			                                           resultsFile.getAbsolutePath());
-			}
-			long elapsedTime = System.nanoTime() - startTime;
-            modelCollector.collectModelCheckingTime(elapsedTime);
-			return formula.trim().replaceAll("\\s+", "");
+			return formula;
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.toString(), e);
 		}
