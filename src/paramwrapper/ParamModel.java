@@ -74,21 +74,29 @@ class ParamModel {
 		return labeledStates;
 	}
 
+	private Command generateCommand(Entry<State, List<Transition>> entry, int initState) {
+		Command command = new Command(initState);
+		if (entry.getValue() != null) {
+		    for (Transition transition : entry.getValue()) {
+		        command.addUpdate(transition.getProbability(),
+		                          transition.getTarget().getIndex());
+		    }
+		} else {
+		    // Workaround: manually adding self-loops in case no
+		    // transition was specified for a given state.
+		    command.addUpdate("1", initState);
+		}
+		
+		return command;
+	}
+	
 	private Map<Integer, Command> getCommands(FDTMC fdtmc) {
 		Map<Integer, Command> tmpCommands = new TreeMap<Integer, Command>();
 		for (Entry<State, List<Transition>> entry : fdtmc.getTransitions().entrySet()) {
 		    int initState = entry.getKey().getIndex();
-			Command command = new Command(initState);
-			if (entry.getValue() != null) {
-			    for (Transition transition : entry.getValue()) {
-			        command.addUpdate(transition.getProbability(),
-			                          transition.getTarget().getIndex());
-			    }
-			} else {
-			    // Workaround: manually adding self-loops in case no
-			    // transition was specified for a given state.
-			    command.addUpdate("1", initState);
-			}
+		    
+		    Command command = generateCommand(entry, initState);
+		    
 			tmpCommands.put(initState, command);
 		}
 		return tmpCommands;
