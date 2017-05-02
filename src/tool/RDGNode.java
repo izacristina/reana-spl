@@ -104,9 +104,12 @@ public class RDGNode {
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof RDGNode) {
             RDGNode other = (RDGNode) obj;
-            return this.getPresenceCondition().equals(other.getPresenceCondition())
-                    && this.getFDTMC().equals(other.getFDTMC())
-                    && this.getDependencies().equals(other.getDependencies());
+            
+            final boolean presenceEquals = this.getPresenceCondition().equals(other.getPresenceCondition());
+            final boolean FDTMCEquals = this.getFDTMC().equals(other.getFDTMC());
+            final boolean dependenciesEquals = this.getDependencies().equals(other.getDependencies());
+            
+            return presenceEquals && FDTMCEquals && dependenciesEquals; 
         }
         return false;
     }
@@ -183,26 +186,31 @@ public class RDGNode {
             // Visiting temporarily marked node -- this means a cyclic dependency!
             throw new CyclicRdgException();
         } else if (!marks.containsKey(node)) {
-            // Mark node temporarily (cycle detection)
-            marks.put(node, false);
-
-            Map<RDGNode, Integer> numberOfPaths = new HashMap<RDGNode, Integer>();
-            // A node always has a path to itself.
-            numberOfPaths.put(node, 1);
-            // The number of paths from a node X to a node Y is equal to the
-            // sum of the numbers of paths from each of its descendants to Y.
-            for (RDGNode child: node.getDependencies()) {
-                Map<RDGNode, Integer> tmpNumberOfPaths = numPathsVisit(child, marks, cache);
-                numberOfPaths = sumPaths(numberOfPaths, tmpNumberOfPaths);
-            }
-            // Mark node permanently (finished sorting branch)
-            marks.put(node, true);
-            cache.put(node, numberOfPaths);
+            Map<RDGNode, Integer> numberOfPaths = topologicalSort(node, marks, cache);
             return numberOfPaths;
         }
         // Otherwise, the node has already been visited.
         return cache.get(node);
     }
+
+	private static Map<RDGNode, Integer> topologicalSort(RDGNode node, Map<RDGNode, Boolean> marks,
+			Map<RDGNode, Map<RDGNode, Integer>> cache) {
+		marks.put(node, false);
+
+		Map<RDGNode, Integer> numberOfPaths = new HashMap<RDGNode, Integer>();
+		// A node always has a path to itself.
+		numberOfPaths.put(node, 1);
+		// The number of paths from a node X to a node Y is equal to the
+		// sum of the numbers of paths from each of its descendants to Y.
+		for (RDGNode child: node.getDependencies()) {
+		    Map<RDGNode, Integer> tmpNumberOfPaths = numPathsVisit(child, marks, cache);
+		    numberOfPaths = sumPaths(numberOfPaths, tmpNumberOfPaths);
+		}
+		// Mark node permanently (finished sorting branch)
+		marks.put(node, true);
+		cache.put(node, numberOfPaths);
+		return numberOfPaths;
+	}
 
     /**
      * Sums two paths-counting maps

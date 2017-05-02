@@ -95,8 +95,7 @@ class ParamModel {
 		String module = "";
 		
 		for (Map.Entry<String, Set<Integer>> entry : labels.entrySet()) {
-			String label = entry.getKey();
-			module += "label \""+label+"\" = ";
+			module += "label \""+entry.getKey()+"\" = ";
 
 			Set<Integer> states = entry.getValue();
 			int count = 1;
