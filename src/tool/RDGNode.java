@@ -63,7 +63,7 @@ public class RDGNode {
 
     public void addDependency(RDGNode child) {
         this.dependencies.add(child);
-        height = Math.max(height, child.height + 1);
+         setHeight(Math.max(height, child.height + 1));
     }
 
     public Collection<RDGNode> getDependencies() {
@@ -85,6 +85,9 @@ public class RDGNode {
      */
     public int getHeight() {
         return height;
+    }
+    public void setHeight(int height){
+    	this.height = height;
     }
 
     public static RDGNode getById(String id) {
@@ -116,7 +119,7 @@ public class RDGNode {
 
     @Override
     public int hashCode() {
-        return id.hashCode() + presenceCondition.hashCode() + fdtmc.hashCode() + dependencies.hashCode();
+        return getId().hashCode() + getPresenceCondition().hashCode() + getFDTMC().hashCode() + getDependencies().hashCode();
     }
 
     @Override
