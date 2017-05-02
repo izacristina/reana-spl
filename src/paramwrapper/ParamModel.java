@@ -108,6 +108,28 @@ class ParamModel {
 		}
 		return tmpParameters;
 	}
+	
+	private String labelsToModule() {
+		String module = "";
+		
+		for (Map.Entry<String, Set<Integer>> entry : labels.entrySet()) {
+			String label = entry.getKey();
+			module += "label \""+label+"\" = ";
+
+			Set<Integer> states = entry.getValue();
+			int count = 1;
+			for (Integer state : states) {
+				module += stateVariable+"="+state;
+				if (count < states.size()) {
+					module += " | ";
+				}
+				count++;
+			}
+			module += ";\n";
+		}
+		
+		return module;
+	}
 
 	@Override
 	public String toString() {
@@ -127,21 +149,8 @@ class ParamModel {
 			module += "	"+command.makeString(stateVariable) + "\n";
 		}
 		module += "endmodule\n\n";
-		for (Map.Entry<String, Set<Integer>> entry : labels.entrySet()) {
-			String label = entry.getKey();
-			module += "label \""+label+"\" = ";
-
-			Set<Integer> states = entry.getValue();
-			int count = 1;
-			for (Integer state : states) {
-				module += stateVariable+"="+state;
-				if (count < states.size()) {
-					module += " | ";
-				}
-				count++;
-			}
-			module += ";\n";
-		}
+		module += labelsToModule();
+		
 		return module;
 	}
 }
