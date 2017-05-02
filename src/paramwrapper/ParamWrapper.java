@@ -58,24 +58,14 @@ public class ParamWrapper implements ParametricModelChecker {
 		return evaluate(modelString, reliabilityProperty, model);
 	}
 	
-	private File writeModelFile(String modelString) throws IOException {
-		File modelFile = File.createTempFile("model", "param");
-		FileWriter modelWriter = new FileWriter(modelFile);
-		modelWriter.write(modelString);
-		modelWriter.flush();
-		modelWriter.close();
+	private File writeFile(String strToBeWritten, String prefix, String suffix) throws IOException {
+		File file = File.createTempFile(prefix, suffix);
+		FileWriter writer = new FileWriter(file);
+		writer.write(strToBeWritten);
+		writer.flush();
+		writer.close();
 		
-		return modelFile;
-	}
-	
-	private File writePropertyFile(String property) throws IOException {
-		File propertyFile = File.createTempFile("property", "prop");
-		FileWriter propertyWriter = new FileWriter(propertyFile);
-		propertyWriter.write(property);
-		propertyWriter.flush();
-		propertyWriter.close();
-		
-		return propertyFile;
+		return file;
 	}
 	
 	private String writeFormula(File modelFile, File propertyFile, File resultsFile, 
@@ -105,9 +95,9 @@ public class ParamWrapper implements ParametricModelChecker {
 		try {
 		    LOGGER.finer(modelString);
 		    
-		    File modelFile = writeModelFile(modelString);
+		    File modelFile = writeFile(modelString, "model", "param");
 		    
-		    File propertyFile = writePropertyFile(property);
+		    File propertyFile = writeFile(property, "property", "prop");
 
 			File resultsFile = File.createTempFile("result", null);
 			
