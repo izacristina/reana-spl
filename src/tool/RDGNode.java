@@ -104,9 +104,12 @@ public class RDGNode {
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof RDGNode) {
             RDGNode other = (RDGNode) obj;
-            return this.getPresenceCondition().equals(other.getPresenceCondition())
-                    && this.getFDTMC().equals(other.getFDTMC())
-                    && this.getDependencies().equals(other.getDependencies());
+            
+            final boolean presenceEquals = this.getPresenceCondition().equals(other.getPresenceCondition());
+            final boolean FDTMCEquals = this.getFDTMC().equals(other.getFDTMC());
+            final boolean dependenciesEquals = this.getDependencies().equals(other.getDependencies());
+            
+            return presenceEquals && FDTMCEquals && dependenciesEquals; 
         }
         return false;
     }
