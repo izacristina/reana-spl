@@ -34,8 +34,16 @@ public class ParamWrapper implements ParametricModelChecker {
 
 	public ParamWrapper(String paramPath, IModelCollector modelCollector) {
 		setParamPath(paramPath);
-		this.usePrism = paramPath.contains("prism");
+		setUsePrism(paramPath.contains("prism"));
 		setModelCollector(modelCollector);
+	}
+	
+	public boolean getUsePrism(){
+		return usePrism;
+	}
+	
+	public void setUsePrism(boolean usePrism){
+		this.usePrism = usePrism;
 	}
 	
 	public IModelCollector getModelCollector(){
@@ -66,7 +74,7 @@ public class ParamWrapper implements ParametricModelChecker {
 		getModelCollector().collectModel(model.getParametersNumber(), model.getStatesNumber());
 		String modelString = model.toString();
 
-		if (usePrism) {
+		if (getUsePrism()) {
 			modelString = modelString.replace("param", "const");
 		}
 		String reliabilityProperty = "P=? [ F \"success\" ]";
@@ -88,7 +96,7 @@ public class ParamWrapper implements ParametricModelChecker {
 			String modelString, ParamModel model) throws IOException {
 		String formula;
 		long startTime = System.nanoTime();
-		if (usePrism) {
+		if (getUsePrism()) {
 			if(!modelString.contains("const")) {
 				formula = invokeModelChecker(modelFile.getAbsolutePath(),
 						propertyFile.getAbsolutePath(),
