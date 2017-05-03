@@ -13,6 +13,7 @@ import fdtmc.FDTMC;
 
 public class RDGNode {
 
+	private static final int _PathToItSelf = 1;
 	//This reference is used to store all the RDGnodes created during the evaluation
 	private static Map<String, RDGNode> rdgNodes = new HashMap<String, RDGNode>();
 	private static List<RDGNode> nodesInCreationOrder = new LinkedList<RDGNode>();
@@ -202,7 +203,7 @@ public class RDGNode {
 
 		Map<RDGNode, Integer> numberOfPaths = new HashMap<RDGNode, Integer>();
 		// A node always has a path to itself.
-		numberOfPaths.put(node, 1);
+		numberOfPaths.put(node, _PathToItSelf);
 		// The number of paths from a node X to a node Y is equal to the
 		// sum of the numbers of paths from each of its descendants to Y.
 		for (RDGNode child: node.getDependencies()) {
