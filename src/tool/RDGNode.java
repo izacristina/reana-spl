@@ -106,7 +106,7 @@ public class RDGNode {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj != null && obj instanceof RDGNode) {
+        if (isObjectValid(obj)) {
             RDGNode other = (RDGNode) obj;
             
             final boolean presenceEquals = this.getPresenceCondition().equals(other.getPresenceCondition());
@@ -117,7 +117,9 @@ public class RDGNode {
         }
         return false;
     }
-
+    private boolean isObjectValid(Object obj){
+    	return obj != null && obj instanceof RDGNode;
+    }
     @Override
     public int hashCode() {
         return getId().hashCode() + getPresenceCondition().hashCode() + getFDTMC().hashCode() + getDependencies().hashCode();
@@ -253,13 +255,15 @@ public class RDGNode {
      */
     public static RDGNode getSimilarNode(RDGNode target) {
         for (RDGNode candidate: nodesInCreationOrder) {
-            if (candidate != target && candidate.equals(target)) {
+            if (isNoteSimilar(candidate, target)) {
                 return candidate;
             }
         }
         return null;
     }
-
+    private static boolean isNoteSimilar(RDGNode candidate, RDGNode target){
+    	return candidate != target && candidate.equals(target);
+    }
     /**
      * Converts this RDG node into a Component<FDTMC>.
      * @return
