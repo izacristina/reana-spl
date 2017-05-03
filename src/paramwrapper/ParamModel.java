@@ -35,18 +35,46 @@ class ParamModel {
 
 	public ParamModel(FDTMC fdtmc) {
 		if (fdtmc.getVariableName() != null) {
-			stateVariable = fdtmc.getVariableName();
+			setStateVariable(fdtmc.getVariableName());
 		}
-		initialState = fdtmc.getInitialState().getIndex();
+		setInitialState(fdtmc.getInitialState().getIndex());
 		
-		commands = new Command(initialState).getCommands(fdtmc);
+		setCommands(new Command(initialState).getCommands(fdtmc));
 		
-		labels = getLabels(fdtmc);
-		stateRangeStart = Collections.min(commands.keySet());
+		setLabels(getLabels(fdtmc));
+		setStateRangeStart(Collections.min(commands.keySet()));
 		// PARAM não deixa declarar um intervalo com apenas um número.
-		stateRangeEnd = Math.max(stateRangeStart + 1,
-								 Collections.max(commands.keySet()));
-		parameters = getParameters(commands.values());
+		setStateRangeEnd(Math.max(stateRangeStart + 1,
+				 Collections.max(commands.keySet())));
+		setParameters(getParameters(commands.values()));
+	}
+	
+	private void setCommands(Map<Integer, Command> commands) {
+		this.commands = commands;
+	}
+	
+	private void setLabels(Map<String, Set<Integer>> labels) {
+		this.labels = labels;
+	}
+	
+	private void setParameters(Set<String> parameters) {
+		this.parameters = parameters;
+	}
+	
+	private void setStateRangeEnd(int stateRangeEnd) {
+		this.stateRangeEnd = stateRangeEnd;
+	}
+	
+	private void setStateRangeStart(int stateRangeStart) {
+		this.stateRangeStart = stateRangeStart;
+	}
+	
+	private void setStateVariable(String stateVariable) {
+		this.stateVariable = stateVariable;
+	}
+	
+	private void setInitialState(int state) {
+		this.initialState = state;
 	}
 
     public int getParametersNumber() {
