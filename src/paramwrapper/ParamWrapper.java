@@ -35,6 +35,14 @@ public class ParamWrapper implements ParametricModelChecker {
 	public ParamWrapper(String paramPath, IModelCollector modelCollector) {
 		setParamPath(paramPath);
 		this.usePrism = paramPath.contains("prism");
+		setModelCollector(modelCollector);
+	}
+	
+	public IModelCollector getModelCollector(){
+		return modelCollector;
+	}
+	
+	public void setModelCollector(IModelCollector modelCollector){
 		this.modelCollector = modelCollector;
 	}
 	
@@ -48,14 +56,14 @@ public class ParamWrapper implements ParametricModelChecker {
 
 	public String fdtmcToParam(FDTMC fdtmc) {
 		ParamModel model = new ParamModel(fdtmc);
-		modelCollector.collectModel(model.getParametersNumber(), model.getStatesNumber());
+		getModelCollector().collectModel(model.getParametersNumber(), model.getStatesNumber());
 		return model.toString();
 	}
 
 	@Override
 	public String getReliability(FDTMC fdtmc) {
 		ParamModel model = new ParamModel(fdtmc);
-		modelCollector.collectModel(model.getParametersNumber(), model.getStatesNumber());
+		getModelCollector().collectModel(model.getParametersNumber(), model.getStatesNumber());
 		String modelString = model.toString();
 
 		if (usePrism) {
@@ -98,7 +106,7 @@ public class ParamWrapper implements ParametricModelChecker {
 					resultsFile.getAbsolutePath());
 		}
 		long elapsedTime = System.nanoTime() - startTime;
-		modelCollector.collectModelCheckingTime(elapsedTime);
+		getModelCollector().collectModelCheckingTime(elapsedTime);
 		return formula.trim().replaceAll("\\s+", "");
 	}
 
