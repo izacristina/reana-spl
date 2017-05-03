@@ -9,11 +9,15 @@ import fdtmc.FDTMC;
  *
  */
 public class BSNNodes {
-
+	
+	public static boolean isNodeInvalid(RDGNode node){
+        return node == null;
+	}
+	
     public static RDGNode getSQLiteRDGNode() {
         String id = "sqlite";
         RDGNode node = RDGNode.getById(id);
-        if (node == null) {
+        if (isNodeInvalid(node)) {
             FDTMC fdtmc = FDTMCStub.createSqliteFDTMC();
             node = new RDGNode(id, "SQLite", fdtmc);
         }
@@ -23,7 +27,7 @@ public class BSNNodes {
     public static RDGNode getFileRDGNode() {
         String id = "file";
         RDGNode node = RDGNode.getById(id);
-        if (node == null) {
+        if (isNodeInvalid(node)) {
             FDTMC fdtmc = FDTMCStub.createFileFDTMC();
             node = new RDGNode(id, "File", fdtmc);
         }
@@ -33,7 +37,7 @@ public class BSNNodes {
     public static RDGNode getMemoryRDGNode() {
         String id = "memory";
         RDGNode node = RDGNode.getById(id);
-        if (node == null) {
+        if (isNodeInvalid(node)) {
             FDTMC fdtmc = FDTMCStub.createMemoryFDTMC();
             node = new RDGNode(id, "Memory", fdtmc);
         }
@@ -43,7 +47,7 @@ public class BSNNodes {
     public static RDGNode getOxygenationRDGNode() {
         String id = "oxygenation";
         RDGNode node = RDGNode.getById(id);
-        if (node == null) {
+        if (isNodeInvalid(node)) {
             FDTMC fdtmc = FDTMCStub.createOxygenationFDTMC();
             node = new RDGNode(id, "Oxygenation", fdtmc);
             node.addDependency(getSQLiteRDGNode());
@@ -56,7 +60,7 @@ public class BSNNodes {
     public static RDGNode getPulseRateRDGNode() {
         String id = "pulseRate";
         RDGNode node = RDGNode.getById(id);
-        if (node == null) {
+        if (isNodeInvalid(node)) {
             FDTMC fdtmc = FDTMCStub.createPulseRateFDTMC();
             node = new RDGNode(id, "PulseRate", fdtmc);
             node.addDependency(getSQLiteRDGNode());
@@ -69,7 +73,7 @@ public class BSNNodes {
     public static RDGNode getSituationRDGNode() {
         String id = "situation";
         RDGNode node = RDGNode.getById(id);
-        if (node == null) {
+        if (isNodeInvalid(node)) {
             FDTMC fdtmc = FDTMCStub.createSituationFDTMC();
             node = new RDGNode(id, "true", fdtmc);
             node.addDependency(getOxygenationRDGNode());
