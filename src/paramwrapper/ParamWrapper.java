@@ -33,9 +33,17 @@ public class ParamWrapper implements ParametricModelChecker {
 	}
 
 	public ParamWrapper(String paramPath, IModelCollector modelCollector) {
-		this.paramPath = paramPath;
+		setParamPath(paramPath);
 		this.usePrism = paramPath.contains("prism");
 		this.modelCollector = modelCollector;
+	}
+	
+	public String getParamPath(){
+		return paramPath;
+	}
+	
+	public void setParamPath(String paramPath){
+		this.paramPath = paramPath;
 	}
 
 	public String fdtmcToParam(FDTMC fdtmc) {
@@ -116,7 +124,7 @@ public class ParamWrapper implements ParametricModelChecker {
 	private String invokeParametricModelChecker(String modelPath,
 			String propertyPath,
 			String resultsPath) throws IOException {
-		String commandLine = paramPath+" "
+		String commandLine = getParamPath()+" "
 				+modelPath+" "
 				+propertyPath+" "
 				+"--result-file "+resultsPath;
@@ -127,7 +135,7 @@ public class ParamWrapper implements ParametricModelChecker {
 			String modelPath,
 			String propertyPath,
 			String resultsPath) throws IOException {
-		String commandLine = paramPath+" "
+		String commandLine = getParamPath()+" "
 				+modelPath+" "
 				+propertyPath+" "
 				+"-exportresults "+resultsPath+" "
@@ -142,7 +150,7 @@ public class ParamWrapper implements ParametricModelChecker {
 	private String invokeModelChecker(String modelPath,
 			String propertyPath,
 			String resultsPath) throws IOException {
-		String commandLine = paramPath+" "
+		String commandLine = getParamPath()+" "
 				+modelPath+" "
 				+propertyPath+" "
 				+"-exportresults "+resultsPath;
