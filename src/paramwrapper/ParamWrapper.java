@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import fdtmc.FDTMC;
+import junit.framework.Assert;
 
 /**
  * Façade to a PARAM executable.
@@ -85,6 +86,9 @@ public class ParamWrapper implements ParametricModelChecker {
 	private File writeFile(String strToBeWritten, String prefix, String suffix) throws IOException {
 		File file = File.createTempFile(prefix, suffix);
 		FileWriter writer = new FileWriter(file);
+		
+		Assert.assertNotNull(writer);
+		
 		writer.write(strToBeWritten);
 		writer.flush();
 		writer.close();
@@ -115,6 +119,9 @@ public class ParamWrapper implements ParametricModelChecker {
 		}
 		long elapsedTime = System.nanoTime() - startTime;
 		getModelCollector().collectModelCheckingTime(elapsedTime);
+		
+		Assert.assertNotNull(formula);
+		
 		return formula.trim().replaceAll("\\s+", "");
 	}
 
@@ -157,9 +164,15 @@ public class ParamWrapper implements ParametricModelChecker {
 				+"-exportresults "+resultsPath+" "
 				+"-param "+String.join(",", model.getParameters());
 		String rawResult = invokeAndGetResult(commandLine, resultsPath);
+		
+		Assert.assertNotNull(rawResult);
+		
 		int openBracket = rawResult.indexOf("{");
 		int closeBracket = rawResult.indexOf("}");
 		String expression = rawResult.substring(openBracket+1, closeBracket);
+		
+		Assert.assertNotNull(expression);
+		
 		return expression.trim().replace('|', '/');
 	}
 
@@ -178,14 +191,16 @@ public class ParamWrapper implements ParametricModelChecker {
 		Process program = Runtime.getRuntime().exec(commandLine);
 		int exitCode = 0;
 		try {
+			Assert.assertNotNull(program);
 			exitCode = program.waitFor();
 		} catch (InterruptedException e) {
 			LOGGER.severe("Exit code: " + exitCode);
 			LOGGER.log(Level.SEVERE, e.toString(), e);
 		}
 		List<String> lines = Files.readAllLines(Paths.get(resultsPath), Charset.forName("UTF-8"));
+		Assert.assertNotNull(lines);
 		lines.removeIf(String::isEmpty);
-		// Formula
+		// Formula		
 		return lines.get(lines.size()-1);
 	}
 
