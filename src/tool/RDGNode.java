@@ -106,7 +106,7 @@ public class RDGNode {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj != null && obj instanceof RDGNode) {
+        if (isObjectValid(obj)) {
             RDGNode other = (RDGNode) obj;
             
             final boolean presenceEquals = this.getPresenceCondition().equals(other.getPresenceCondition());
@@ -118,7 +118,9 @@ public class RDGNode {
         }
         return false;
     }
-
+    private boolean isObjectValid(Object obj){
+    	return obj != null && obj instanceof RDGNode;
+    }
     @Override
     public int hashCode() {
         int hashedCode = getId().hashCode() + getPresenceCondition().hashCode() + getFDTMC().hashCode() + getDependencies().hashCode();
@@ -155,10 +157,10 @@ public class RDGNode {
      * @throws CyclicRdgException
      */
     private void topoSortVisit(RDGNode node, Map<RDGNode, Boolean> marks, List<RDGNode> sorted) throws CyclicRdgException {
-        if (marks.containsKey(node) && marks.get(node) == false) {
+        if (isCyclicDependency(node, marks)) {
             // Visiting temporarily marked node -- this means a cyclic dependency!
             throw new CyclicRdgException();
-        } else if (!marks.containsKey(node)) {
+        } else if (nodeNotVisited(node, marks)) {
             // Mark node temporarily (cycle detection)
             marks.put(node, false);
             for (RDGNode child: node.getDependencies()) {
@@ -169,6 +171,10 @@ public class RDGNode {
             sorted.add(node);
         }
     }
+
+	private static boolean isCyclicDependency(RDGNode node, Map<RDGNode, Boolean> marks) {
+		return marks.containsKey(node) && marks.get(node) == false;
+	}
 
     /**
      * Computes the number of paths from source nodes to every known node.
@@ -189,16 +195,20 @@ public class RDGNode {
 
     // TODO Parameterize topological sort of RDG.
     private static Map<RDGNode, Integer> numPathsVisit(RDGNode node, Map<RDGNode, Boolean> marks, Map<RDGNode, Map<RDGNode, Integer>> cache) throws CyclicRdgException {
-        if (marks.containsKey(node) && marks.get(node) == false) {
+        if (isCyclicDependency(node, marks)) {
             // Visiting temporarily marked node -- this means a cyclic dependency!
             throw new CyclicRdgException();
-        } else if (!marks.containsKey(node)) {
+        } else if (nodeNotVisited(node, marks)) {
             Map<RDGNode, Integer> numberOfPaths = topologicalSort(node, marks, cache);
             return numberOfPaths;
         }
         // Otherwise, the node has already been visited.
         return cache.get(node);
     }
+
+	private static boolean nodeNotVisited(RDGNode node, Map<RDGNode, Boolean> marks) {
+		return !marks.containsKey(node);
+	}
 
 	private static Map<RDGNode, Integer> topologicalSort(RDGNode node, Map<RDGNode, Boolean> marks,
 			Map<RDGNode, Map<RDGNode, Integer>> cache) {
@@ -248,13 +258,15 @@ public class RDGNode {
      */
     public static RDGNode getSimilarNode(RDGNode target) {
         for (RDGNode candidate: nodesInCreationOrder) {
-            if (candidate != target && candidate.equals(target)) {
+            if (isNoteSimilar(candidate, target)) {
                 return candidate;
             }
         }
         return null;
     }
-
+    private static boolean isNoteSimilar(RDGNode candidate, RDGNode target){
+    	return candidate != target && candidate.equals(target);
+    }
     /**
      * Converts this RDG node into a Component<FDTMC>.
      * @return
