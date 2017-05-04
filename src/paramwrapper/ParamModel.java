@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import fdtmc.FDTMC;
 import fdtmc.State;
 import fdtmc.Transition;
+import junit.framework.Assert;
 
 
 
@@ -64,6 +65,9 @@ class ParamModel {
 	private Map<String, Set<Integer>> getLabels(FDTMC fdtmc) {
 		Map<String, Set<Integer>> labeledStates = new TreeMap<String, Set<Integer>>();
 		Collection<State> states = fdtmc.getStates();
+		
+		Assert.assertNotNull(states);
+		
 		for (State s : states) {
 			String label = s.getLabel();
 			if (label != null && !label.isEmpty()) {
@@ -98,6 +102,9 @@ class ParamModel {
 			module += "label \""+entry.getKey()+"\" = ";
 
 			Set<Integer> states = entry.getValue();
+			
+			Assert.assertNotNull(states);
+			
 			int count = 1;
 			for (Integer state : states) {
 				module += stateVariable+"="+state;
