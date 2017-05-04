@@ -113,19 +113,22 @@ public class RDGNode {
             final boolean FDTMCEquals = this.getFDTMC().equals(other.getFDTMC());
             final boolean dependenciesEquals = this.getDependencies().equals(other.getDependencies());
             
-            return presenceEquals && FDTMCEquals && dependenciesEquals; 
+            boolean isEquals = presenceEquals && FDTMCEquals && dependenciesEquals; 
+            return isEquals;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return getId().hashCode() + getPresenceCondition().hashCode() + getFDTMC().hashCode() + getDependencies().hashCode();
+        int hashedCode = getId().hashCode() + getPresenceCondition().hashCode() + getFDTMC().hashCode() + getDependencies().hashCode();
+        return hashedCode;
     }
 
     @Override
     public String toString() {
-        return getId() + " (" + getPresenceCondition() + ")";
+        String presenceCondition = getId() + " (" + getPresenceCondition() + ")";
+        return presenceCondition;
     }
 
     /**
@@ -260,16 +263,18 @@ public class RDGNode {
         Collection<Component<FDTMC>> dependencies = this.getDependencies().stream()
                 .map(RDGNode::toComponent)
                 .collect(Collectors.toSet());
-        return new Component<FDTMC>(this.getId(),
+        Component<FDTMC> component = new Component<FDTMC>(this.getId(),
                                     this.getPresenceCondition(),
                                     this.getFDTMC(),
                                     dependencies);
+        return component;
     }
 
     public static List<Component<FDTMC>> toComponentList(List<RDGNode> nodes) {
-        return nodes.stream()
+        List<Component<FDTMC>> nodeList = nodes.stream()
                 .map(RDGNode::toComponent)
                 .collect(Collectors.toList());
+        return nodeList;
     }
 
 }
