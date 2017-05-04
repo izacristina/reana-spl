@@ -13,6 +13,7 @@ import fdtmc.FDTMC;
 
 public class RDGNode {
 
+	private static final int _PathToItSelf = 1;
 	//This reference is used to store all the RDGnodes created during the evaluation
 	private static Map<String, RDGNode> rdgNodes = new HashMap<String, RDGNode>();
 	private static List<RDGNode> nodesInCreationOrder = new LinkedList<RDGNode>();
@@ -63,7 +64,7 @@ public class RDGNode {
 
     public void addDependency(RDGNode child) {
         this.dependencies.add(child);
-        height = Math.max(height, child.height + 1);
+         setHeight(Math.max(height, child.height + 1));
     }
 
     public Collection<RDGNode> getDependencies() {
@@ -85,6 +86,9 @@ public class RDGNode {
      */
     public int getHeight() {
         return height;
+    }
+    public void setHeight(int height){
+    	this.height = height;
     }
 
     public static RDGNode getById(String id) {
@@ -109,19 +113,22 @@ public class RDGNode {
             final boolean FDTMCEquals = this.getFDTMC().equals(other.getFDTMC());
             final boolean dependenciesEquals = this.getDependencies().equals(other.getDependencies());
             
-            return presenceEquals && FDTMCEquals && dependenciesEquals; 
+            boolean isEquals = presenceEquals && FDTMCEquals && dependenciesEquals; 
+            return isEquals;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return id.hashCode() + presenceCondition.hashCode() + fdtmc.hashCode() + dependencies.hashCode();
+        int hashedCode = getId().hashCode() + getPresenceCondition().hashCode() + getFDTMC().hashCode() + getDependencies().hashCode();
+        return hashedCode;
     }
 
     @Override
     public String toString() {
-        return getId() + " (" + getPresenceCondition() + ")";
+        String presenceCondition = getId() + " (" + getPresenceCondition() + ")";
+        return presenceCondition;
     }
 
     /**
@@ -199,7 +206,7 @@ public class RDGNode {
 
 		Map<RDGNode, Integer> numberOfPaths = new HashMap<RDGNode, Integer>();
 		// A node always has a path to itself.
-		numberOfPaths.put(node, 1);
+		numberOfPaths.put(node, _PathToItSelf);
 		// The number of paths from a node X to a node Y is equal to the
 		// sum of the numbers of paths from each of its descendants to Y.
 		for (RDGNode child: node.getDependencies()) {
@@ -256,16 +263,18 @@ public class RDGNode {
         Collection<Component<FDTMC>> dependencies = this.getDependencies().stream()
                 .map(RDGNode::toComponent)
                 .collect(Collectors.toSet());
-        return new Component<FDTMC>(this.getId(),
+        Component<FDTMC> component = new Component<FDTMC>(this.getId(),
                                     this.getPresenceCondition(),
                                     this.getFDTMC(),
                                     dependencies);
+        return component;
     }
 
     public static List<Component<FDTMC>> toComponentList(List<RDGNode> nodes) {
-        return nodes.stream()
+        List<Component<FDTMC>> nodeList = nodes.stream()
                 .map(RDGNode::toComponent)
                 .collect(Collectors.toList());
+        return nodeList;
     }
 
 }

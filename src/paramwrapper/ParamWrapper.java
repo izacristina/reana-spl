@@ -33,24 +33,48 @@ public class ParamWrapper implements ParametricModelChecker {
 	}
 
 	public ParamWrapper(String paramPath, IModelCollector modelCollector) {
-		this.paramPath = paramPath;
-		this.usePrism = paramPath.contains("prism");
+		setParamPath(paramPath);
+		setUsePrism(paramPath.contains("prism"));
+		setModelCollector(modelCollector);
+	}
+	
+	public boolean getUsePrism(){
+		return usePrism;
+	}
+	
+	public void setUsePrism(boolean usePrism){
+		this.usePrism = usePrism;
+	}
+	
+	public IModelCollector getModelCollector(){
+		return modelCollector;
+	}
+	
+	public void setModelCollector(IModelCollector modelCollector){
 		this.modelCollector = modelCollector;
+	}
+	
+	public String getParamPath(){
+		return paramPath;
+	}
+	
+	public void setParamPath(String paramPath){
+		this.paramPath = paramPath;
 	}
 
 	public String fdtmcToParam(FDTMC fdtmc) {
 		ParamModel model = new ParamModel(fdtmc);
-		modelCollector.collectModel(model.getParametersNumber(), model.getStatesNumber());
+		getModelCollector().collectModel(model.getParametersNumber(), model.getStatesNumber());
 		return model.toString();
 	}
 
 	@Override
 	public String getReliability(FDTMC fdtmc) {
 		ParamModel model = new ParamModel(fdtmc);
-		modelCollector.collectModel(model.getParametersNumber(), model.getStatesNumber());
+		getModelCollector().collectModel(model.getParametersNumber(), model.getStatesNumber());
 		String modelString = model.toString();
 
-		if (usePrism) {
+		if (getUsePrism()) {
 			modelString = modelString.replace("param", "const");
 		}
 		String reliabilityProperty = "P=? [ F \"success\" ]";
@@ -72,7 +96,7 @@ public class ParamWrapper implements ParametricModelChecker {
 			String modelString, ParamModel model) throws IOException {
 		String formula;
 		long startTime = System.nanoTime();
-		if (usePrism) {
+		if (getUsePrism()) {
 			if(!modelString.contains("const")) {
 				formula = invokeModelChecker(modelFile.getAbsolutePath(),
 						propertyFile.getAbsolutePath(),
@@ -90,7 +114,7 @@ public class ParamWrapper implements ParametricModelChecker {
 					resultsFile.getAbsolutePath());
 		}
 		long elapsedTime = System.nanoTime() - startTime;
-		modelCollector.collectModelCheckingTime(elapsedTime);
+		getModelCollector().collectModelCheckingTime(elapsedTime);
 		return formula.trim().replaceAll("\\s+", "");
 	}
 
@@ -116,7 +140,7 @@ public class ParamWrapper implements ParametricModelChecker {
 	private String invokeParametricModelChecker(String modelPath,
 			String propertyPath,
 			String resultsPath) throws IOException {
-		String commandLine = paramPath+" "
+		String commandLine = getParamPath()+" "
 				+modelPath+" "
 				+propertyPath+" "
 				+"--result-file "+resultsPath;
@@ -127,7 +151,7 @@ public class ParamWrapper implements ParametricModelChecker {
 			String modelPath,
 			String propertyPath,
 			String resultsPath) throws IOException {
-		String commandLine = paramPath+" "
+		String commandLine = getParamPath()+" "
 				+modelPath+" "
 				+propertyPath+" "
 				+"-exportresults "+resultsPath+" "
@@ -142,7 +166,7 @@ public class ParamWrapper implements ParametricModelChecker {
 	private String invokeModelChecker(String modelPath,
 			String propertyPath,
 			String resultsPath) throws IOException {
-		String commandLine = paramPath+" "
+		String commandLine = getParamPath()+" "
 				+modelPath+" "
 				+propertyPath+" "
 				+"-exportresults "+resultsPath;
